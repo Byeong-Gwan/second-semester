@@ -3,8 +3,8 @@
 import React from "react";
 import MainProgressCard from "./_components/MainProgressCard";
 import WeeklyTimelineCard from "./_components/WeeklyTimelineCard";
-import Header from "./header"
 import TodoListCard from "./_components/TodoListCard"
+import Header from "./Header"
 import AttendanceCard from "./_components/AttendanceCard"
 
 
