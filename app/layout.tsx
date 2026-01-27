@@ -1,6 +1,7 @@
 import "./globals.css";
 import { ReactNode } from "react";
 import { Providers } from "@/components/providers";
+import Link from "next/link";
 
 export const metadata = {
   title: "Second Semester",
@@ -16,7 +17,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             {/* header */}
             <header className="border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
               <div className="container h-14 flex items-center justify-between">
-                <span className="font-semibold">Second Semester</span>
+                <Link href="/" className="font-semibold hover:opacity-80 transition-opacity">Second Semester</Link>
               </div>
             </header>
             {/* // header */}
@@ -31,7 +32,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <footer className="border-t">
               <div className="container h-14 flex items-center justify-between text-sm text-muted-foreground">
                 <span>© {new Date().getFullYear()} Second Semester</span>
-                <span>v0.1.0</span>
+                <span>v0.1.2</span>
               </div>
             </footer>
             {/* // footer */}
