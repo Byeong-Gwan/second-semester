@@ -2,6 +2,7 @@ import "./globals.css";
 import { ReactNode } from "react";
 import { Providers } from "@/components/providers";
 import Link from "next/link";
+import { HeaderNavSwitch } from "@/components/HeaderNavSwitch";
 
 export const metadata = {
   title: "Second Semester",
@@ -18,6 +19,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <header className="border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
               <div className="container h-14 flex items-center justify-between">
                 <Link href="/" className="font-semibold hover:opacity-80 transition-opacity">Second Semester</Link>
+                <nav className="flex items-center gap-3">
+                  <HeaderNavSwitch />
+                </nav>
               </div>
             </header>
             {/* // header */}
