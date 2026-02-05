@@ -1,4 +1,5 @@
 import { create, type StateCreator } from "zustand";
+import { persist } from "zustand/middleware";
 import { format } from "date-fns";
 
 // 이 파일은 '시간표 공책'이에요. 하루에 무엇을 하는지 줄줄이 적어두고 꺼내 봅니다.
@@ -30,16 +31,8 @@ function dateToKey(d: Date) {
   return format(d, "yyyy-MM-dd");
 }
 
-// 시작할 때 가지고 있을 예시(샘플) 일정들이에요.
-const seed: TimelineItem[] = [
-  { id: "w1", date: "2026-01-26", start: "19:30", end: "21:00", title: "알고리즘 스터디", type: "study" },
-  { id: "w2", date: "2026-01-27", start: "20:00", end: "22:00", title: "토익 LC", type: "language" },
-  { id: "w3", date: "2026-01-29", start: "19:00", end: "20:30", title: "CS정리", type: "solo" },
-  { id: "w4", date: "2026-01-31", start: "10:00", end: "12:00", title: "프로젝트 작업", type: "project" },
-];
-
 const creator: StateCreator<TimelineState> = (set, get) => ({
-  items: seed,
+  items: [],
   add: (item: Omit<TimelineItem, "id">) => {
     const id = `t_${Math.random().toString(36).slice(2, 8)}`;
     set((s: TimelineState) => ({ items: [...s.items, { id, ...item }] }));
@@ -60,6 +53,10 @@ const creator: StateCreator<TimelineState> = (set, get) => ({
   },
 });
 
-export const useTimelineStore = create<TimelineState>(creator);
+export const useTimelineStore = create<TimelineState>()(
+  persist(creator, {
+    name: "timeline-storage",
+  })
+);
 
 export { dateToKey };
