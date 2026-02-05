@@ -1,147 +1,179 @@
-// 이 파일은 우리 집의 '메인 방'이에요. 화면에 보이는 내용을 그려줘요.
-// 아주 쉬운 말로: 여기 있는 글과 상자들이 화면에 차례대로 나타나요.
 "use client";
 import React from "react";
 import { useRouter } from "next/navigation";
 import { useLearningStore } from "@/lib/store/learnings";
-import { format } from "date-fns";
+import { useTodoStore } from "@/lib/store/todos";
+import { useTimelineStore } from "@/lib/store/timeline";
+import { useAttendanceStore } from "@/lib/store/attendance";
+import { BookOpen, Calendar, CheckSquare, UserCheck, ArrowRight } from "lucide-react";
 
 export default function DashboardPage() {
   const router = useRouter();
+  const [mounted, setMounted] = React.useState(false);
+  
   const learnings = useLearningStore((s) => s.learnings);
-  const addLearning = useLearningStore((s) => s.addLearning);
-  const removeLearning = useLearningStore((s) => s.removeLearning);
-  const toggleJoined = useLearningStore((s) => s.toggleJoined);
-  const updateProgress = useLearningStore((s) => s.updateProgress);
+  const todos = useTodoStore((s) => s.todos);
+  const timelineItems = useTimelineStore((s) => s.items);
+  const { getAttendanceRate } = useAttendanceStore();
 
-  const [open, setOpen] = React.useState(false);
-  const [title, setTitle] = React.useState("");
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
-  const onCreate = (e: React.FormEvent) => {
-    e.preventDefault();
-    const t = title.trim();
-    if (!t) return;
-    addLearning(t);
-    setTitle("");
-    setOpen(false);
-    // 생성 후 메인에서 바로 목록으로 확인 가능. 필요하면 router.push("/mypage")
+  const stats = {
+    learnings: learnings.length,
+    activeLearnings: learnings.filter((l) => l.joined).length,
+    todos: todos.length,
+    activeTodos: todos.filter((t) => !t.completed).length,
+    timeline: timelineItems.length,
+    todayTimeline: timelineItems.filter((t) => t.date === new Date().toISOString().split("T")[0]).length,
+    attendanceRate: mounted ? getAttendanceRate() : 0,
   };
 
+  if (!mounted) {
+    return (
+      <main className="container max-w-5xl space-y-8 py-8">
+        <section className="text-center space-y-2">
+          <h1 className="text-3xl font-bold tracking-tight">Second Semester</h1>
+          <p className="text-muted-foreground">로딩 중...</p>
+        </section>
+      </main>
+    );
+  }
+
   return (
-    <main className="container space-y-6 py-8">
-      {/* 히어로: 학습 생성 우선 */}
-      <section className="rounded-xl border p-6 bg-card">
-        <h1 className="text-2xl font-bold tracking-tight">오늘의 학습을 시작해요</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          학습을 만들고, 위에 있는 MY 버튼으로 나의 목록을 더 편하게 관리할 수 있어요.
-        </p>
-        <div className="mt-4 flex flex-wrap gap-2">
-          <button
-            className="inline-flex items-center rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground hover:opacity-90"
-            onClick={() => setOpen(true)}
-          >
-            학습 만들기
-          </button>
-        </div>
+    <main className="container max-w-5xl space-y-8 py-8">
+      {/* 헤더 */}
+      <section className="text-center space-y-2">
+        <h1 className="text-3xl font-bold tracking-tight">Second Semester</h1>
+        <p className="text-muted-foreground">학습, 일정, 할 일, 출석을 한눈에 관리하세요</p>
       </section>
 
-      {/* 간단 요약 */}
-      <section className="rounded-lg border p-4">
-        <div className="text-sm text-muted-foreground">내가 만든 학습</div>
-        <div className="mt-1 text-lg font-semibold">{learnings.length}개</div>
+      {/* 대시보드 카드 */}
+      <section className="grid gap-6 md:grid-cols-2">
+        {/* 학습 관리 */}
+        <DashboardCard
+          icon={<BookOpen className="h-8 w-8" />}
+          title="학습 관리"
+          description="내 학습 목록과 진행 상황"
+          stats={[
+            { label: "전체 학습", value: stats.learnings },
+            { label: "참여 중", value: stats.activeLearnings },
+          ]}
+          action="학습 보러가기"
+          onClick={() => router.push("/mypage")}
+        />
+
+        {/* 타임라인 */}
+        <DashboardCard
+          icon={<Calendar className="h-8 w-8" />}
+          title="타임라인"
+          description="주간 일정과 스케줄"
+          stats={[
+            { label: "전체 일정", value: stats.timeline },
+            { label: "오늘 일정", value: stats.todayTimeline },
+          ]}
+          action="일정 보러가기"
+          onClick={() => router.push("/mypage/timeline")}
+        />
+
+        {/* 할 일 */}
+        <DashboardCard
+          icon={<CheckSquare className="h-8 w-8" />}
+          title="할 일"
+          description="오늘의 할 일과 완료율"
+          stats={[
+            { label: "전체 할 일", value: stats.todos },
+            { label: "남은 할 일", value: stats.activeTodos },
+          ]}
+          action="할 일 보러가기"
+          onClick={() => router.push("/mypage/todos")}
+        />
+
+        {/* 출석 */}
+        <DashboardCard
+          icon={<UserCheck className="h-8 w-8" />}
+          title="출석 체크"
+          description="출석률과 결석 현황"
+          stats={[{ label: "출석률", value: `${stats.attendanceRate}%` }]}
+          action="출석 보러가기"
+          onClick={() => router.push("/mypage/attendance")}
+        />
       </section>
 
-      {/* 생성된 학습 목록(간단) */}
-      {learnings.length > 0 && (
-        <section className="space-y-3">
-          <h2 className="text-lg font-semibold">최근 학습</h2>
-          <div className="grid gap-4 md:grid-cols-2">
-            {learnings.map((l) => (
-              <div key={l.id} className="rounded-lg border p-4 bg-card space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="font-semibold">{l.title}</div>
-                  <button
-                    className="text-xs text-red-500 hover:underline"
-                    onClick={() => removeLearning(l.id)}
-                  >
-                    삭제
-                  </button>
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  생성일: {format(new Date(l.createdAt), "yyyy.MM.dd HH:mm")}
-                </div>
-
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="text-muted-foreground">진척도</span>
-                  <input
-                    type="range"
-                    min={0}
-                    max={100}
-                    value={l.progress}
-                    onChange={(e) => updateProgress(l.id, Number(e.target.value))}
-                  />
-                  <span className="w-10 text-right">{l.progress}%</span>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="text-xs text-muted-foreground">
-                    상태: {l.joined ? "참여 중" : "참여 안 함"}
-                  </div>
-                  <button
-                    className="rounded-md border px-3 py-1 text-xs hover:bg-accent"
-                    onClick={() => toggleJoined(l.id)}
-                  >
-                    {l.joined ? "참여 해제" : "참여하기"}
-                  </button>
-                </div>
-              </div>
-            ))}
+      {/* 빠른 시작 가이드 */}
+      {stats.learnings === 0 && stats.todos === 0 && stats.timeline === 0 && (
+        <section className="rounded-lg border border-dashed p-8 text-center space-y-4">
+          <h2 className="text-xl font-semibold">시작하기</h2>
+          <p className="text-sm text-muted-foreground max-w-md mx-auto">
+            위 카드를 클릭하여 각 영역으로 이동하고, 학습을 추가하거나 일정을 만들어보세요!
+          </p>
+          <div className="flex flex-wrap gap-3 justify-center">
+            <button
+              onClick={() => router.push("/mypage")}
+              className="rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground hover:opacity-90"
+            >
+              학습 만들기
+            </button>
+            <button
+              onClick={() => router.push("/mypage/timeline")}
+              className="rounded-md border px-4 py-2 text-sm hover:bg-accent"
+            >
+              일정 추가하기
+            </button>
+            <button
+              onClick={() => router.push("/mypage/todos")}
+              className="rounded-md border px-4 py-2 text-sm hover:bg-accent"
+            >
+              할 일 추가하기
+            </button>
           </div>
         </section>
       )}
-
-      {/* 생성 모달 */}
-      {open ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="w-full max-w-md rounded-xl border bg-background p-5 shadow-lg">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold">새 학습 만들기</h2>
-              <button
-                className="text-sm text-muted-foreground hover:underline"
-                onClick={() => setOpen(false)}
-              >
-                닫기
-              </button>
-            </div>
-            <form onSubmit={onCreate} className="mt-4 space-y-3">
-              <label className="block text-sm">
-                제목
-                <input
-                  className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary"
-                  placeholder="예: 수학 복습 플랜"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                />
-              </label>
-              <div className="flex justify-end gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setOpen(false)}
-                  className="rounded-md border px-4 py-2 text-sm hover:bg-accent"
-                >
-                  취소
-                </button>
-                <button
-                  type="submit"
-                  className="rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground hover:opacity-90"
-                >
-                  만들기
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      ) : null}
     </main>
+  );
+}
+
+function DashboardCard({
+  icon,
+  title,
+  description,
+  stats,
+  action,
+  onClick,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  stats: { label: string; value: string | number }[];
+  action: string;
+  onClick: () => void;
+}) {
+  return (
+    <div
+      onClick={onClick}
+      className="group rounded-lg border p-6 bg-card hover:bg-accent/50 cursor-pointer transition-all hover:shadow-md"
+    >
+      <div className="flex items-start justify-between mb-4">
+        <div className="text-primary">{icon}</div>
+      </div>
+
+      <h3 className="text-xl font-semibold mb-1">{title}</h3>
+      <p className="text-sm text-muted-foreground mb-4">{description}</p>
+
+      <div className="flex gap-6 mb-4">
+        {stats.map((stat, i) => (
+          <div key={i}>
+            <div className="text-2xl font-bold">{stat.value}</div>
+            <div className="text-xs text-muted-foreground">{stat.label}</div>
+          </div>
+        ))}
+      </div>
+
+      <div className="flex items-center gap-2 text-sm text-primary font-medium group-hover:gap-3 transition-all">
+        {action}
+        <ArrowRight className="h-4 w-4" />
+      </div>
+    </div>
   );
 }
