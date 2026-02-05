@@ -2,11 +2,28 @@
 // 이 파일은 우리 집의 '메인 방'이에요. 화면에 보이는 내용을 그려줘요.
 // 아주 쉬운 말로: 여기 있는 글과 상자들이 화면에 차례대로 나타나요.
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { addDays, format } from "date-fns";
 import Link from "next/link";
 import React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useTimelineStore, type TimelineState, type TimelineItem, dateToKey } from "@/lib/store/timeline";
+import { useTimelineStore, type TimelineState, type TimelineItem, type TimelineType, dateToKey } from "@/lib/store/timeline";
+
+const typeLabels: Record<TimelineType, string> = {
+  study: "스터디",
+  language: "어학",
+  solo: "개인학습",
+  project: "프로젝트",
+  etc: "기타",
+};
+
+const typeColors: Record<TimelineType, string> = {
+  study: "bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20",
+  language: "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20",
+  solo: "bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-500/20",
+  project: "bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20",
+  etc: "bg-gray-500/10 text-gray-700 dark:text-gray-400 border-gray-500/20",
+};
 
 export default function WeeklyTimelineCard() {
   const days = ["월", "화", "수", "목", "금", "토", "일"];
@@ -51,12 +68,18 @@ export default function WeeklyTimelineCard() {
             ) : (
               <div className="flex flex-col gap-2 min-w-0">
                 {items.map((w: TimelineItem, idx: number) => (
-                    <div key={idx} className="rounded-md border-0 bg-background/80 p-2 min-w-0">
-                      <div className="text-xs text-muted-foreground">
-                        {w.start} - {w.end}
+                    <div key={idx} className={`rounded-md border p-2 min-w-0 ${typeColors[w.type]}`}>
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="text-xs opacity-70">
+                          {w.start} - {w.end}
+                        </div>
+                        <Badge variant="outline" className={`text-[10px] px-1.5 py-0 ${typeColors[w.type]}`}>
+                          {typeLabels[w.type]}
+                        </Badge>
                       </div>
-                      <div className="mt-1 text-sm font-medium truncate break-keep" title={w.title}>{w.title}</div>
-                      <div className="mt-1 text-[11px] text-muted-foreground">{w.type}</div>
+                      <div className={`mt-1 text-sm font-medium truncate break-keep ${w.done ? "line-through opacity-60" : ""}`} title={w.title}>
+                        {w.title}
+                      </div>
                     </div>
                   ))}
               </div>
