@@ -20,6 +20,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               <div className="container h-14 flex items-center justify-between">
                 <Link href="/" className="font-semibold hover:opacity-80 transition-opacity">Second Semester</Link>
                 <nav className="flex items-center gap-3">
+                  <Link href="/mypage/settings" className="rounded-md border px-3 py-1.5 text-sm hover:bg-accent">
+                    설정
+                  </Link>
                   <HeaderNavSwitch />
                 </nav>
               </div>
@@ -36,7 +39,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <footer className="border-t">
               <div className="container h-14 flex items-center justify-between text-sm text-muted-foreground">
                 <span>© {new Date().getFullYear()} Second Semester</span>
-                <span>v0.1.2</span>
+                <span>v0.2.0</span>
               </div>
             </footer>
             {/* // footer */}
