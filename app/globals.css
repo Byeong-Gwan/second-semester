@@ -2,6 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 모바일 터치 최적화 */
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  html {
+    -webkit-text-size-adjust: 100%;
+    touch-action: manipulation;
+  }
+  
+  body {
+    overscroll-behavior-y: none;
+  }
+  
+  button, a {
+    touch-action: manipulation;
+  }
+}
+
 @layer base {
   :root {
     /* 라이트 모드 기본 색상 (shadcn/ui 기준) */
