@@ -7,6 +7,16 @@ import { HeaderNavSwitch } from "@/components/HeaderNavSwitch";
 export const metadata = {
   title: "Second Semester",
   description: "Virtual semester study planner",
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+  },
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "white" },
+    { media: "(prefers-color-scheme: dark)", color: "black" },
+  ],
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
@@ -38,8 +48,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             {/* footer */}
             <footer className="border-t">
               <div className="container h-14 flex items-center justify-between text-sm text-muted-foreground">
-                <span>© {new Date().getFullYear()} Second Semester</span>
-                <span>v0.2.0</span>
+                <span> {new Date().getFullYear()} Second Semester</span>
+                <span>v0.4.0</span>
               </div>
             </footer>
             {/* // footer */}
