@@ -4,13 +4,13 @@ import { CardDetailLayout } from "@/components/detail/CardDetailLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useAttendanceStore } from "@/lib/store/attendance";
-import { ChevronLeft, ChevronRight, CheckCircle, XCircle, Clock } from "lucide-react";
+import { ChevronLeft, ChevronRight, CheckCircle, XCircle, Clock, Flame, TrendingUp, Calendar as CalendarIcon } from "lucide-react";
 import React from "react";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addMonths, subMonths } from "date-fns";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addMonths, subMonths, startOfWeek, endOfWeek } from "date-fns";
 import { ko } from "date-fns/locale";
 
 export default function AttendancePage() {
-  const { records, markAttendance, removeAttendance, getAttendanceRate, allowedAbsences, getUsedAbsences, getRemainingAbsences } = useAttendanceStore();
+  const { records, markAttendance, removeAttendance, getAttendanceRate, allowedAbsences, getUsedAbsences, getRemainingAbsences, getMonthStats, getWeekStats, getStreak } = useAttendanceStore();
   const [currentDate, setCurrentDate] = React.useState(new Date());
 
   const year = currentDate.getFullYear();
@@ -50,6 +50,10 @@ export default function AttendancePage() {
   const attendanceRate = getAttendanceRate();
   const usedAbsences = getUsedAbsences();
   const remainingAbsences = getRemainingAbsences();
+  const monthStats = getMonthStats(year, month);
+  const weekStart = startOfWeek(new Date(), { weekStartsOn: 0 });
+  const weekStats = getWeekStats(weekStart);
+  const streak = getStreak();
 
   return (
     <CardDetailLayout title="출석" description="월간 캘린더와 통계를 확인합니다.">
@@ -136,15 +140,42 @@ export default function AttendancePage() {
         </Card>
       </section>
 
+      {/* 연속 출석 & 주요 통계 */}
       <section className="space-y-4">
-        <h2 className="text-lg font-semibold">통계</h2>
-        <div className="grid gap-4 md:grid-cols-3">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm font-medium">출석률</CardTitle>
+        <h2 className="text-lg font-semibold">주요 통계</h2>
+        <div className="grid gap-4 md:grid-cols-4">
+          <Card className="border-2 bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-950/20 dark:to-orange-950/20 border-red-200 dark:border-red-800">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">연속 출석</CardTitle>
+              <Flame className="h-4 w-4 text-red-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">{attendanceRate}%</div>
+              <div className="text-3xl font-bold text-red-600 dark:text-red-400">{streak}일 🔥</div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {streak >= 7 ? "대단해요!" : "매일 출석해보세요"}
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className={`border-2 ${
+            attendanceRate >= 90 ? "bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800" :
+            attendanceRate >= 70 ? "bg-yellow-50 border-yellow-200 dark:bg-yellow-950/20 dark:border-yellow-800" :
+            "bg-gray-50 border-gray-200 dark:bg-gray-950/20 dark:border-gray-800"
+          }`}>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">전체 출석률</CardTitle>
+              <TrendingUp className={`h-4 w-4 ${
+                attendanceRate >= 90 ? "text-green-600" :
+                attendanceRate >= 70 ? "text-yellow-600" :
+                "text-gray-600"
+              }`} />
+            </CardHeader>
+            <CardContent>
+              <div className={`text-3xl font-bold ${
+                attendanceRate >= 90 ? "text-green-600 dark:text-green-400" :
+                attendanceRate >= 70 ? "text-yellow-600 dark:text-yellow-400" :
+                "text-gray-600 dark:text-gray-400"
+              }`}>{attendanceRate}%</div>
               <p className="text-xs text-muted-foreground mt-1">
                 총 {records.length}일 중 {records.filter((r) => r.status === "present").length}일 출석
               </p>
@@ -152,8 +183,9 @@ export default function AttendancePage() {
           </Card>
 
           <Card>
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">결석 현황</CardTitle>
+              <XCircle className="h-4 w-4 text-red-600" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold">
@@ -164,8 +196,9 @@ export default function AttendancePage() {
           </Card>
 
           <Card>
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">지각</CardTitle>
+              <Clock className="h-4 w-4 text-yellow-600" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold">{records.filter((r) => r.status === "late").length}회</div>
@@ -173,6 +206,64 @@ export default function AttendancePage() {
             </CardContent>
           </Card>
         </div>
+      </section>
+
+      {/* 이번 주 통계 */}
+      <section className="space-y-4">
+        <h2 className="text-lg font-semibold">이번 주 통계</h2>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="grid gap-4 md:grid-cols-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-green-600 dark:text-green-400">{weekStats.present}일</div>
+                <p className="text-xs text-muted-foreground mt-1">출석</p>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{weekStats.late}일</div>
+                <p className="text-xs text-muted-foreground mt-1">지각</p>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-red-600 dark:text-red-400">{weekStats.absent}일</div>
+                <p className="text-xs text-muted-foreground mt-1">결석</p>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold">{weekStats.rate}%</div>
+                <p className="text-xs text-muted-foreground mt-1">출석률</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </section>
+
+      {/* 이번 달 통계 */}
+      <section className="space-y-4">
+        <h2 className="text-lg font-semibold">이번 달 통계</h2>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="grid gap-4 md:grid-cols-5">
+              <div className="text-center">
+                <div className="text-2xl font-bold">{monthStats.total}일</div>
+                <p className="text-xs text-muted-foreground mt-1">기록된 날</p>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-green-600 dark:text-green-400">{monthStats.present}일</div>
+                <p className="text-xs text-muted-foreground mt-1">출석</p>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{monthStats.late}일</div>
+                <p className="text-xs text-muted-foreground mt-1">지각</p>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-red-600 dark:text-red-400">{monthStats.absent}일</div>
+                <p className="text-xs text-muted-foreground mt-1">결석</p>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold">{monthStats.rate}%</div>
+                <p className="text-xs text-muted-foreground mt-1">출석률</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </section>
     </CardDetailLayout>
   );
