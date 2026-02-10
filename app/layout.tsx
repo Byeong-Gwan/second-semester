@@ -28,13 +28,24 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             {/* header */}
             <header className="border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
               <div className="container h-14 flex items-center justify-between">
-                <Link href="/" className="font-semibold hover:opacity-80 transition-opacity">Second Semester</Link>
-                <nav className="flex items-center gap-3">
-                  <Link href="/mypage/settings" className="rounded-md border px-3 py-1.5 text-sm hover:bg-accent">
+                <nav className="flex items-center gap-6">
+                  <Link href="/" className="text-sm font-medium hover:text-primary transition-colors">
+                    홈
+                  </Link>
+                  <Link href="/dashboard" className="text-sm font-medium hover:text-primary transition-colors">
+                    대시보드
+                  </Link>
+                  <Link href="/weather" className="text-sm font-medium hover:text-primary transition-colors">
+                    일상
+                  </Link>
+                  <Link href="/mypage" className="text-sm font-medium hover:text-primary transition-colors">
+                    마이페이지
+                  </Link>
+                  <Link href="/mypage/settings" className="text-sm font-medium hover:text-primary transition-colors">
                     설정
                   </Link>
-                  <HeaderNavSwitch />
                 </nav>
+                <HeaderNavSwitch />
               </div>
             </header>
             {/* // header */}

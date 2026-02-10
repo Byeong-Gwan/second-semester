@@ -11,9 +11,9 @@ import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addMonths,
 import { ko } from "date-fns/locale";
 
 const priorityColors = {
-  low: "bg-gray-500/10 text-gray-700 dark:text-gray-400 border-gray-500/20",
-  medium: "bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20",
-  high: "bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/20",
+  low: "bg-gray-100 text-gray-700 dark:bg-gray-950/50 dark:text-gray-400 border-gray-400",
+  medium: "bg-yellow-100 text-yellow-700 dark:bg-yellow-950/50 dark:text-yellow-400 border-yellow-500",
+  high: "bg-red-100 text-red-700 dark:bg-red-950/50 dark:text-red-400 border-red-500 font-semibold",
 };
 
 const priorityLabels = {
@@ -379,18 +379,31 @@ function TodoItem({
   onToggle: (id: string) => void;
 }) {
   return (
-    <div className="flex items-center gap-3 rounded-md border p-3 hover:bg-accent/50">
+    <div className={`flex items-center gap-3 rounded-md border-2 p-3 transition-all ${
+      todo.completed 
+        ? "bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800" 
+        : todo.priority === "high"
+        ? "bg-red-50 border-red-200 dark:bg-red-950/20 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-950/30"
+        : todo.priority === "medium"
+        ? "bg-yellow-50 border-yellow-200 dark:bg-yellow-950/20 dark:border-yellow-800 hover:bg-yellow-100 dark:hover:bg-yellow-950/30"
+        : "bg-gray-50 border-gray-200 dark:bg-gray-950/20 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-950/30"
+    }`}>
       <Checkbox 
         checked={todo.completed} 
         onCheckedChange={(checked) => {
           onToggle(todo.id);
         }} 
+        className={todo.completed ? "border-green-500 data-[state=checked]:bg-green-500" : ""}
       />
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <span className={`font-medium ${todo.completed ? "line-through opacity-60" : ""}`}>{todo.title}</span>
+          <span className={`font-medium ${
+            todo.completed 
+              ? "line-through text-green-700 dark:text-green-400" 
+              : ""
+          }`}>{todo.title}</span>
           <Badge variant="outline" className={`text-xs ${priorityColors[todo.priority]}`}>
-            {priorityLabels[todo.priority]}
+            {todo.priority === "high" ? "🔥 " : ""}{priorityLabels[todo.priority]}
           </Badge>
         </div>
         {todo.dueDate && (
@@ -402,7 +415,7 @@ function TodoItem({
       </div>
       <button
         onClick={() => onRemove(todo.id)}
-        className="shrink-0 rounded-md p-2 hover:bg-destructive/20 text-destructive"
+        className="shrink-0 rounded-md p-2 hover:bg-red-100 dark:hover:bg-red-950/30 text-red-600 dark:text-red-400"
         aria-label="삭제"
       >
         <Trash2 size={16} />
