@@ -15,7 +15,10 @@ import {
   Flame,
   Trophy,
   Calendar as CalendarIcon,
-  BookOpen
+  BookOpen,
+  BarChart3,
+  Award,
+  Zap
 } from "lucide-react";
 import { format, startOfWeek, endOfWeek, eachDayOfInterval, isToday } from "date-fns";
 import { ko } from "date-fns/locale";
@@ -73,6 +76,10 @@ export default function DashboardPage() {
   });
 
   const streak = calculateStreak(monthRecords);
+  
+  const learningProgress = calculateLearningProgress(learnings);
+  const weeklyTodoCompletion = calculateWeeklyTodoCompletion(todos);
+  const achievements = calculateAchievements(attendanceRate, completionRate, streak, activeLearnings.length);
 
   return (
     <main className="container max-w-6xl py-8 space-y-8">
@@ -339,6 +346,173 @@ export default function DashboardPage() {
         </Card>
       </section>
 
+      {/* 학습 진행률 분석 */}
+      <section>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BarChart3 className="h-5 w-5" />
+              학습 진행률 분석
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {learnings.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <BookOpen className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                <p>진행 중인 학습이 없습니다</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {learnings.slice(0, 5).map((learning) => (
+                  <div key={learning.id} className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Link
+                        href={`/mypage/learning/${learning.id}`}
+                        className="font-medium hover:text-primary transition-colors"
+                      >
+                        {learning.title}
+                      </Link>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={learning.joined ? "default" : "secondary"}>
+                          {learning.joined ? "참여 중" : "미참여"}
+                        </Badge>
+                        <span className="text-sm font-semibold">{learning.progress}%</span>
+                      </div>
+                    </div>
+                    <div className="relative h-3 bg-muted rounded-full overflow-hidden">
+                      <div
+                        className={`absolute inset-y-0 left-0 rounded-full transition-all ${
+                          learning.progress >= 80 ? "bg-green-500" :
+                          learning.progress >= 50 ? "bg-blue-500" :
+                          learning.progress >= 30 ? "bg-yellow-500" :
+                          "bg-gray-400"
+                        }`}
+                        style={{ width: `${learning.progress}%` }}
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {learning.startDate} ~ {learning.endDate}
+                    </p>
+                  </div>
+                ))}
+                {learningProgress.average > 0 && (
+                  <div className="pt-4 border-t">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">평균 진행률</span>
+                      <span className="font-bold text-lg">{learningProgress.average}%</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </section>
+
+      {/* 주간 할 일 완료 트렌드 */}
+      <section>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5" />
+              주간 할 일 완료 트렌드
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="grid grid-cols-7 gap-2">
+                {weeklyTodoCompletion.map((day, index) => (
+                  <div key={index} className="text-center">
+                    <div className="text-xs text-muted-foreground mb-2">
+                      {format(day.date, "EEE", { locale: ko })}
+                    </div>
+                    <div className="relative h-24 bg-muted rounded-lg overflow-hidden">
+                      <div
+                        className={`absolute inset-x-0 bottom-0 rounded-t-lg transition-all ${
+                          day.rate >= 80 ? "bg-green-500" :
+                          day.rate >= 50 ? "bg-blue-500" :
+                          day.rate >= 30 ? "bg-yellow-500" :
+                          "bg-gray-400"
+                        }`}
+                        style={{ height: `${day.rate}%` }}
+                      />
+                    </div>
+                    <div className="text-xs font-semibold mt-2">{day.rate}%</div>
+                    <div className="text-xs text-muted-foreground">
+                      {day.completed}/{day.total}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="flex items-center justify-between pt-4 border-t">
+                <span className="text-sm text-muted-foreground">주간 평균 완료율</span>
+                <span className="text-lg font-bold">
+                  {Math.round(weeklyTodoCompletion.reduce((sum, day) => sum + day.rate, 0) / 7)}%
+                </span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </section>
+
+      {/* 성과 및 달성 현황 */}
+      <section>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Award className="h-5 w-5" />
+              성과 및 달성 현황
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-2">
+              {achievements.map((achievement, index) => (
+                <div
+                  key={index}
+                  className={`p-4 rounded-lg border-2 ${
+                    achievement.achieved
+                      ? "bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-950/20 dark:to-orange-950/20 border-yellow-300 dark:border-yellow-700"
+                      : "bg-muted/50 border-muted"
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className={`text-3xl ${
+                      achievement.achieved ? "" : "opacity-30 grayscale"
+                    }`}>
+                      {achievement.icon}
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold mb-1">{achievement.title}</h3>
+                      <p className="text-xs text-muted-foreground mb-2">
+                        {achievement.description}
+                      </p>
+                      {achievement.achieved ? (
+                        <Badge className="bg-yellow-500 text-white">
+                          <Trophy className="h-3 w-3 mr-1" />
+                          달성!
+                        </Badge>
+                      ) : (
+                        <div className="space-y-1">
+                          <div className="text-xs text-muted-foreground">
+                            {achievement.progress}/{achievement.target}
+                          </div>
+                          <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-primary transition-all"
+                              style={{ width: `${(achievement.progress / achievement.target) * 100}%` }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </section>
+
       {/* 빠른 액션 */}
       <section className="grid gap-4 md:grid-cols-2">
         <Link href="/mypage/todos">
@@ -402,4 +576,79 @@ function calculateStreak(records: Array<{ date: string; status: string }>): numb
   }
   
   return streak;
+}
+
+function calculateLearningProgress(learnings: any[]): { average: number; total: number } {
+  if (learnings.length === 0) return { average: 0, total: 0 };
+  const total = learnings.reduce((sum, l) => sum + l.progress, 0);
+  return {
+    average: Math.round(total / learnings.length),
+    total: learnings.length
+  };
+}
+
+function calculateWeeklyTodoCompletion(todos: any[]): Array<{ date: Date; total: number; completed: number; rate: number }> {
+  const today = new Date();
+  const weekStart = startOfWeek(today, { weekStartsOn: 0 });
+  const weekEnd = endOfWeek(today, { weekStartsOn: 0 });
+  const weekDays = eachDayOfInterval({ start: weekStart, end: weekEnd });
+  
+  return weekDays.map(day => {
+    const dateStr = format(day, "yyyy-MM-dd");
+    const dayTodos = todos.filter(t => t.dueDate === dateStr);
+    const completed = dayTodos.filter(t => t.completed).length;
+    const total = dayTodos.length;
+    const rate = total === 0 ? 0 : Math.round((completed / total) * 100);
+    
+    return { date: day, total, completed, rate };
+  });
+}
+
+function calculateAchievements(
+  attendanceRate: number,
+  completionRate: number,
+  streak: number,
+  activeLearnings: number
+): Array<{
+  title: string;
+  description: string;
+  icon: string;
+  achieved: boolean;
+  progress: number;
+  target: number;
+}> {
+  return [
+    {
+      title: "완벽한 출석",
+      description: "출석률 90% 이상 달성",
+      icon: "🎯",
+      achieved: attendanceRate >= 90,
+      progress: attendanceRate,
+      target: 90
+    },
+    {
+      title: "할 일 마스터",
+      description: "할 일 완료율 80% 이상 달성",
+      icon: "✅",
+      achieved: completionRate >= 80,
+      progress: completionRate,
+      target: 80
+    },
+    {
+      title: "연속 출석 챔피언",
+      description: "7일 연속 출석 달성",
+      icon: "🔥",
+      achieved: streak >= 7,
+      progress: streak,
+      target: 7
+    },
+    {
+      title: "학습 열정가",
+      description: "3개 이상의 학습 참여",
+      icon: "📚",
+      achieved: activeLearnings >= 3,
+      progress: activeLearnings,
+      target: 3
+    }
+  ];
 }
