@@ -18,7 +18,8 @@ import {
   BookOpen,
   BarChart3,
   Award,
-  Zap
+  Zap,
+  ArrowRight
 } from "lucide-react";
 import { format, startOfWeek, endOfWeek, eachDayOfInterval, isToday } from "date-fns";
 import { ko } from "date-fns/locale";
@@ -28,8 +29,8 @@ export default function DashboardPage() {
   const [mounted, setMounted] = React.useState(false);
   
   const learnings = useLearningStore((s) => s.learnings);
-  const { todos, getCompletionRate } = useTodoStore();
-  const { getAttendanceRate, getMonthRecords } = useAttendanceStore();
+  const { todos, getCompletionRate, toggleTodo } = useTodoStore();
+  const { records, getAttendanceRate, getMonthRecords, markAttendance, removeAttendance } = useAttendanceStore();
 
   React.useEffect(() => {
     setMounted(true);
@@ -176,25 +177,48 @@ export default function DashboardPage() {
       <section>
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <CalendarIcon className="h-5 w-5" />
-              이번 주 출석 현황
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <CalendarIcon className="h-5 w-5" />
+                이번 주 출석 현황
+              </CardTitle>
+              <Link 
+                href="/mypage/attendance" 
+                className="text-sm text-primary hover:underline flex items-center gap-1"
+              >
+                출석 체크하기
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+            <p className="text-sm text-muted-foreground mt-2">
+              ⚪ 미체크 · ✅ 출석 · ⏰ 지각 · ❌ 결석
+            </p>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-7 gap-2">
               {weekAttendance.map(({ date, status }) => {
                 const isTodayDate = isToday(date);
+                const dateStr = format(date, "yyyy-MM-dd");
+                
+                const handleCircleClick = (e: React.MouseEvent) => {
+                  e.stopPropagation();
+                  if (!status) {
+                    markAttendance(dateStr, "present");
+                  } else if (status === "present") {
+                    markAttendance(dateStr, "late");
+                  } else if (status === "late") {
+                    markAttendance(dateStr, "absent");
+                  } else {
+                    removeAttendance(dateStr);
+                  }
+                };
+                
                 return (
                   <div
                     key={date.toISOString()}
                     className={`
-                      flex flex-col items-center p-3 rounded-lg border-2
-                      ${isTodayDate ? "ring-2 ring-primary" : ""}
-                      ${status === "present" ? "bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800" : ""}
-                      ${status === "late" ? "bg-yellow-50 border-yellow-200 dark:bg-yellow-950/20 dark:border-yellow-800" : ""}
-                      ${status === "absent" ? "bg-red-50 border-red-200 dark:bg-red-950/20 dark:border-red-800" : ""}
-                      ${!status ? "bg-muted/50" : ""}
+                      flex flex-col items-center p-3 rounded-lg border-2 bg-muted/50
+                      ${isTodayDate ? "ring-2 ring-primary" : "border-border"}
                     `}
                   >
                     <div className="text-xs text-muted-foreground">
@@ -203,13 +227,39 @@ export default function DashboardPage() {
                     <div className="text-lg font-bold mt-1">
                       {format(date, "d")}
                     </div>
-                    <div className="text-2xl mt-1">
-                      {status === "present" ? "✅" : status === "late" ? "⏰" : status === "absent" ? "❌" : "⚪"}
-                    </div>
+                    <button
+                      onClick={handleCircleClick}
+                      className="mt-1 flex items-center justify-center cursor-pointer hover:scale-110 transition-transform"
+                      aria-label="출석 상태 변경"
+                    >
+                      {status === "present" && (
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-green-400 to-green-600 shadow-lg shadow-green-500/50" />
+                      )}
+                      {status === "late" && (
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 shadow-lg shadow-yellow-500/50" />
+                      )}
+                      {status === "absent" && (
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-red-400 to-red-600 shadow-lg shadow-red-500/50" />
+                      )}
+                      {!status && (
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gray-300 to-gray-400 dark:from-gray-600 dark:to-gray-700 shadow-md" />
+                      )}
+                    </button>
                   </div>
                 );
               })}
             </div>
+            {weekAttendance.every(w => !w.status) && (
+              <div className="mt-4 p-4 rounded-lg bg-muted/50 text-center">
+                <p className="text-sm text-muted-foreground">
+                  아직 출석 체크를 하지 않았어요. 
+                  <Link href="/mypage/attendance" className="text-primary hover:underline ml-1">
+                    출석 관리 페이지
+                  </Link>
+                  에서 캘린더 날짜를 클릭하여 출석 체크하세요!
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
       </section>
@@ -247,24 +297,34 @@ export default function DashboardPage() {
                 {todayTodos.slice(0, 5).map((todo) => (
                   <div
                     key={todo.id}
+                    onClick={() => toggleTodo(todo.id)}
                     className={`
-                      flex items-center gap-3 p-3 rounded-lg border-2
+                      flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer
                       ${todo.completed ? "bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800" : 
                         todo.priority === "high" ? "bg-red-50 border-red-200 dark:bg-red-950/20 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-950/30" :
                         todo.priority === "medium" ? "bg-yellow-50 border-yellow-200 dark:bg-yellow-950/20 dark:border-yellow-800 hover:bg-yellow-100 dark:hover:bg-yellow-950/30" :
                         "bg-gray-50 border-gray-200 dark:bg-gray-950/20 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-950/30"}
-                      transition-colors
+                      transition-all hover:scale-[1.02]
                     `}
                   >
-                    <div className={`
-                      h-5 w-5 rounded-full border-2 flex items-center justify-center
-                      ${todo.completed ? "bg-green-500 border-green-500" : 
-                        todo.priority === "high" ? "border-red-500" :
-                        todo.priority === "medium" ? "border-yellow-500" :
-                        "border-gray-400"}
-                    `}>
-                      {todo.completed && <CheckCircle2 className="h-4 w-4 text-white" />}
-                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleTodo(todo.id);
+                      }}
+                      className="flex-shrink-0 hover:scale-110 transition-transform"
+                      aria-label="할 일 완료 토글"
+                    >
+                      <div className={`
+                        h-6 w-6 rounded-full border-2 flex items-center justify-center
+                        ${todo.completed ? "bg-gradient-to-br from-green-400 to-green-600 border-green-500 shadow-lg shadow-green-500/50" : 
+                          todo.priority === "high" ? "border-red-500" :
+                          todo.priority === "medium" ? "border-yellow-500" :
+                          "border-gray-400"}
+                      `}>
+                        {todo.completed && <CheckCircle2 className="h-4 w-4 text-white" />}
+                      </div>
+                    </button>
                     <span className={`flex-1 ${todo.completed ? "line-through text-green-700 dark:text-green-400" : "font-medium"}`}>
                       {todo.title}
                     </span>
