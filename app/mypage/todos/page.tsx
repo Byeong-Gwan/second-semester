@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useTodoStore, type Todo } from "@/lib/store/todos";
-import { Plus, Trash2, Search, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Trash2, Search, Calendar, ChevronLeft, ChevronRight, CheckCircle2 } from "lucide-react";
 import React from "react";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addMonths, subMonths, isSameDay } from "date-fns";
 import { ko } from "date-fns/locale";
@@ -30,15 +30,10 @@ export default function TodosPage() {
   const [searchQuery, setSearchQuery] = React.useState("");
   const [sortBy, setSortBy] = React.useState<"createdAt" | "dueDate" | "priority">("createdAt");
   const [currentMonth, setCurrentMonth] = React.useState(new Date());
-  const [mounted, setMounted] = React.useState(false);
   const [showYearPicker, setShowYearPicker] = React.useState(false);
   const [showMonthPicker, setShowMonthPicker] = React.useState(false);
 
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const completionRate = mounted ? getCompletionRate() : 0;
+  const completionRate = getCompletionRate();
 
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
@@ -388,13 +383,24 @@ function TodoItem({
         ? "bg-yellow-50 border-yellow-200 dark:bg-yellow-950/20 dark:border-yellow-800 hover:bg-yellow-100 dark:hover:bg-yellow-950/30"
         : "bg-gray-50 border-gray-200 dark:bg-gray-950/20 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-950/30"
     }`}>
-      <Checkbox 
-        checked={todo.completed} 
-        onCheckedChange={(checked) => {
-          onToggle(todo.id);
-        }} 
-        className={todo.completed ? "border-green-500 data-[state=checked]:bg-green-500" : ""}
-      />
+      <button
+        onClick={() => onToggle(todo.id)}
+        className="flex-shrink-0 hover:scale-110 transition-transform"
+        aria-label="할 일 완료 토글"
+      >
+        <div className={`
+          h-6 w-6 rounded-full border-2 flex items-center justify-center
+          ${todo.completed 
+            ? "bg-gradient-to-br from-green-400 to-green-600 border-green-500 shadow-lg shadow-green-500/50" 
+            : todo.priority === "high" 
+              ? "border-red-500" 
+              : todo.priority === "medium" 
+                ? "border-yellow-500" 
+                : "border-gray-400"}
+        `}>
+          {todo.completed && <CheckCircle2 className="h-4 w-4 text-white" />}
+        </div>
+      </button>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <span className={`font-medium ${
