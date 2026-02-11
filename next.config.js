@@ -3,10 +3,30 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ["lucide-react"],
   },
-  // 성능 최적화
-  compress: true,
+  reactStrictMode: true,
   poweredByHeader: false,
-  // 보안 헤더
+  compress: true,
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'openweathermap.org',
+      },
+    ],
+    formats: ['image/avif', 'image/webp'],
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/api/weather',
+        destination: '/api/weather',
+      },
+      {
+        source: '/api/news',
+        destination: '/api/news',
+      },
+    ];
+  },
   async headers() {
     return [
       {

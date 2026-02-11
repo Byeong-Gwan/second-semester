@@ -1,0 +1,10 @@
+# robots.txt for Second Semester
+
+User-agent: *
+Allow: /
+
+# Disallow admin or private pages (if any in future)
+# Disallow: /admin/
+
+# Sitemap location
+Sitemap: https://second-semester.vercel.app/sitemap.xml
