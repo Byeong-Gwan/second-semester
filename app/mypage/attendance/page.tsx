@@ -98,12 +98,13 @@ export default function AttendancePage() {
                     key={date.toISOString()}
                     onClick={() => handleDayClick(date)}
                     className={`
-                      aspect-square rounded-md p-2 text-sm transition-colors
-                      ${isToday ? "ring-2 ring-primary" : ""}
+                      aspect-square rounded-md p-2 text-sm transition-colors relative
+                      ${isToday && !status ? "ring-2 ring-primary bg-primary/5 font-semibold" : ""}
+                      ${isToday && status ? "ring-2 ring-offset-2 ring-primary font-semibold" : ""}
                       ${status?.status === "present" ? "bg-green-500/20 text-green-700 dark:text-green-400" : ""}
                       ${status?.status === "late" ? "bg-yellow-500/20 text-yellow-700 dark:text-yellow-400" : ""}
                       ${status?.status === "absent" ? "bg-red-500/20 text-red-700 dark:text-red-400" : ""}
-                      ${!status ? "hover:bg-accent" : ""}
+                      ${!status && !isToday ? "hover:bg-accent" : ""}
                     `}
                   >
                     <div className="flex flex-col items-center justify-center h-full">
