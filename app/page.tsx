@@ -149,19 +149,64 @@ function DashboardCard({
   action: string;
   onClick: () => void;
 }) {
+  // 각 카드별 색상 테마
+  const getCardTheme = () => {
+    switch (title) {
+      case "학습 관리":
+        return {
+          border: "border-blue-200 dark:border-blue-800 hover:border-blue-300",
+          bg: "hover:bg-blue-50/50 dark:hover:bg-blue-950/20",
+          icon: "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30",
+          text: "text-blue-600 dark:text-blue-400"
+        };
+      case "타임라인":
+        return {
+          border: "border-purple-200 dark:border-purple-800 hover:border-purple-300",
+          bg: "hover:bg-purple-50/50 dark:hover:bg-purple-950/20",
+          icon: "text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/30",
+          text: "text-purple-600 dark:text-purple-400"
+        };
+      case "할 일":
+        return {
+          border: "border-green-200 dark:border-green-800 hover:border-green-300",
+          bg: "hover:bg-green-50/50 dark:hover:bg-green-950/20",
+          icon: "text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/30",
+          text: "text-green-600 dark:text-green-400"
+        };
+      case "출석 체크":
+        return {
+          border: "border-orange-200 dark:border-orange-800 hover:border-orange-300",
+          bg: "hover:bg-orange-50/50 dark:hover:bg-orange-950/20",
+          icon: "text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/30",
+          text: "text-orange-600 dark:text-orange-400"
+        };
+      default:
+        return {
+          border: "border-border",
+          bg: "hover:bg-accent/50",
+          icon: "text-primary",
+          text: "text-primary"
+        };
+    }
+  };
+
+  const theme = getCardTheme();
+
   return (
     <div
       onClick={onClick}
-      className="group rounded-lg border p-6 bg-card hover:bg-accent/50 cursor-pointer transition-all hover:shadow-md"
+      className={`group rounded-xl border-2 p-6 bg-card cursor-pointer transition-all hover:shadow-lg ${theme.border} ${theme.bg}`}
     >
       <div className="flex items-start justify-between mb-4">
-        <div className="text-primary">{icon}</div>
+        <div className={`p-3 rounded-lg ${theme.icon}`}>
+          {icon}
+        </div>
       </div>
 
-      <h3 className="text-xl font-semibold mb-1">{title}</h3>
-      <p className="text-sm text-muted-foreground mb-4">{description}</p>
+      <h3 className="text-xl font-bold mb-2">{title}</h3>
+      <p className="text-sm text-muted-foreground mb-6">{description}</p>
 
-      <div className="flex gap-6 mb-4">
+      <div className="flex gap-6 mb-6">
         {stats.map((stat, i) => (
           <div key={i}>
             <div className="text-2xl font-bold">{stat.value}</div>
@@ -170,7 +215,7 @@ function DashboardCard({
         ))}
       </div>
 
-      <div className="flex items-center gap-2 text-sm text-primary font-medium group-hover:gap-3 transition-all">
+      <div className={`flex items-center gap-2 text-sm font-semibold group-hover:gap-3 transition-all ${theme.text}`}>
         {action}
         <ArrowRight className="h-4 w-4" />
       </div>
