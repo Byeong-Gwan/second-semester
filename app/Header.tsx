@@ -1,13 +1,14 @@
 "use client";
-// 이 파일은 우리 집의 '메인 방'이에요. 화면에 보이는 내용을 그려줘요.
-// 아주 쉬운 말로: 여기 있는 글과 상자들이 화면에 차례대로 나타나요.
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Home, LayoutGrid, Clock, BookOpen, Calendar, User } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import React from "react";
 
 export default function Header() {
-  // 여기는 가짜 데이터(연습용 정보)예요. 진짜 서버가 없어도 보여줄 수 있게 준비했어요.
+  const pathname = usePathname();
   const today = new Date();
   const semester = {
     name: "2026 Q1 세컨드 학기",
@@ -16,15 +17,43 @@ export default function Header() {
     progress: 42,
   };
 
+  const navItems = [
+    { href: "/", icon: Home, label: "홈" },
+    { href: "/dashboard", icon: LayoutGrid, label: "대시보드" },
+    { href: "/mypage/study-log", icon: Clock, label: "학습 일지" },
+    { href: "/mypage/reflection", icon: BookOpen, label: "회고" },
+    { href: "/mypage/timeline", icon: Calendar, label: "타임라인" },
+    { href: "/mypage", icon: User, label: "MY" },
+  ];
+
   return (
-    // 화면의 큰 영역을 만드는 곳이에요.
-      <header className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">{semester.name}</h1>
-          <p className="text-sm text-muted-foreground">{format(semester.start, "PPP", { locale: ko })} - {format(semester.end, "PPP", { locale: ko })}</p>
-        </div>
-        {/* 이 버튼을 누르면 밝게/어둡게 바뀌어요. */}
-        <ThemeToggle />
-      </header>
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-14 items-center justify-between px-4 sm:px-6">
+        <Link href="/" className="flex items-center space-x-2">
+          <span className="font-bold text-sm sm:text-base">2S</span>
+        </Link>
+        
+        {/* 네비게이션 메뉴 */}
+        <nav className="flex items-center gap-1">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`p-2 rounded-md hover:bg-accent transition-colors ${
+                  isActive ? "bg-accent" : ""
+                }`}
+                title={item.label}
+              >
+                <Icon className="h-5 w-5" />
+              </Link>
+            );
+          })}
+          <ThemeToggle />
+        </nav>
+      </div>
+    </header>
   );
 }
