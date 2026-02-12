@@ -3,8 +3,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
-const CLIENT_ID = process.env.NEXT_PUBLIC_NAVER_CLIENT_ID;
-const CLIENT_SECRET = process.env.NEXT_PUBLIC_NAVER_CLIENT_SECRET;
+const CLIENT_ID = process.env.NAVER_CLIENT_ID;
+const CLIENT_SECRET = process.env.NAVER_CLIENT_SECRET;
 
 // HTML 태그 및 엔티티 제거 함수
 function cleanHtmlText(text: string): string {
