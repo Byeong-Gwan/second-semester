@@ -10,6 +10,7 @@ export interface AttendanceRecord {
 interface AttendanceState {
   records: AttendanceRecord[];
   allowedAbsences: number;
+  lastCheckedDate: string; // 마지막으로 자동 결석 처리를 확인한 날짜
   markAttendance: (date: string, status: "present" | "absent" | "late") => void;
   removeAttendance: (date: string) => void;
   getUsedAbsences: () => number;
@@ -32,6 +33,7 @@ interface AttendanceState {
     absent: number;
     rate: number;
   };
+  autoMarkAbsentForPastDays: () => void;
 }
 
 export const useAttendanceStore = create<AttendanceState>()(
@@ -39,6 +41,7 @@ export const useAttendanceStore = create<AttendanceState>()(
     (set, get) => ({
       records: [],
       allowedAbsences: 5,
+      lastCheckedDate: format(new Date(), "yyyy-MM-dd"),
       markAttendance: (date: string, status: "present" | "absent" | "late") => {
         set((s) => {
           const existing = s.records.find((r) => r.date === date);
@@ -133,6 +136,39 @@ export const useAttendanceStore = create<AttendanceState>()(
         const absent = records.filter((r) => r.status === "absent").length;
         const rate = total === 0 ? 100 : Math.round((present / total) * 100);
         return { total, present, late, absent, rate };
+      },
+      autoMarkAbsentForPastDays: () => {
+        const today = format(new Date(), "yyyy-MM-dd");
+        const state = get();
+        const lastChecked = state.lastCheckedDate;
+        
+        // 오늘이 마지막 체크 날짜와 다르면 (새로운 날이 시작됨)
+        if (today !== lastChecked) {
+          const lastCheckedDate = new Date(lastChecked);
+          const todayDate = new Date(today);
+          
+          // 마지막 체크 날짜부터 어제까지의 모든 날짜를 확인
+          const currentDate = new Date(lastCheckedDate);
+          const newRecords = [...state.records];
+          
+          while (currentDate < todayDate) {
+            const dateStr = format(currentDate, "yyyy-MM-dd");
+            
+            // 해당 날짜에 기록이 없으면 결석으로 자동 처리
+            const hasRecord = newRecords.some(r => r.date === dateStr);
+            if (!hasRecord) {
+              newRecords.push({ date: dateStr, status: "absent" });
+            }
+            
+            // 다음 날로 이동
+            currentDate.setDate(currentDate.getDate() + 1);
+          }
+          
+          set({ 
+            records: newRecords,
+            lastCheckedDate: today
+          });
+        }
       },
     }),
     {

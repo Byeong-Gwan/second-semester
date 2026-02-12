@@ -10,8 +10,13 @@ import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addMonths,
 import { ko } from "date-fns/locale";
 
 export default function AttendancePage() {
-  const { records, markAttendance, removeAttendance, getAttendanceRate, allowedAbsences, getUsedAbsences, getRemainingAbsences, getMonthStats, getWeekStats, getStreak } = useAttendanceStore();
+  const { records, markAttendance, removeAttendance, getAttendanceRate, allowedAbsences, getUsedAbsences, getRemainingAbsences, getMonthStats, getWeekStats, getStreak, autoMarkAbsentForPastDays } = useAttendanceStore();
   const [currentDate, setCurrentDate] = React.useState(new Date());
+
+  React.useEffect(() => {
+    // 페이지 로드 시 자동으로 과거 미체크 날짜를 결석으로 처리
+    autoMarkAbsentForPastDays();
+  }, [autoMarkAbsentForPastDays]);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth() + 1;
