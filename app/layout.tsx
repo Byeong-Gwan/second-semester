@@ -1,56 +1,30 @@
 import "./globals.css";
+import type { Metadata } from "next";
 import { ReactNode } from "react";
 import { Providers } from "@/components/providers";
 import Link from "next/link";
 import { HeaderNavSwitch } from "@/components/HeaderNavSwitch";
 import { Home, LayoutDashboard, Sun, User, Settings } from "lucide-react";
+import { generateMetadata as genMeta, generateStructuredData } from "@/lib/utils/seo";
 
-export const metadata = {
-  title: {
-    default: "Second Semester - 학습 관리 플래너",
-    template: "%s | Second Semester"
-  },
-  description: "학습, 할 일, 출석, 일정을 한 곳에서 관리하는 스마트 학습 플래너. 진행률 추적, 통계 분석, 실시간 날씨와 뉴스까지.",
-  keywords: ["학습 관리", "플래너", "할 일 관리", "출석 체크", "학습 진행률", "스터디 플래너", "대시보드"],
-  authors: [{ name: "Second Semester Team" }],
-  creator: "Second Semester",
-  publisher: "Second Semester",
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-    },
-  },
-  openGraph: {
-    type: "website",
-    locale: "ko_KR",
-    url: "https://second-semester.vercel.app",
-    title: "Second Semester - 학습 관리 플래너",
-    description: "학습, 할 일, 출석, 일정을 한 곳에서 관리하는 스마트 학습 플래너",
-    siteName: "Second Semester",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Second Semester - 학습 관리 플래너",
-    description: "학습, 할 일, 출석, 일정을 한 곳에서 관리하는 스마트 학습 플래너",
-  },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 5,
-    userScalable: true,
-  },
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "white" },
-    { media: "(prefers-color-scheme: dark)", color: "black" },
-  ],
-};
+export const metadata: Metadata = genMeta({
+  title: "Second Semester",
+  description: "학습, 일정, 할 일, 출석을 한눈에 관리하는 스마트 학습 플래너. 체계적인 학습 관리와 생산성 향상을 위한 올인원 솔루션",
+  keywords: ["학습 플래너", "할 일 관리", "출석 체크", "스터디 플래너", "일정 관리", "생산성"],
+  path: "/",
+});
 
 export default function RootLayout({ children }: { children: ReactNode }) {
+  const structuredData = generateStructuredData("WebApplication");
+  
   return (
     <html lang="ko" suppressHydrationWarning>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
+      </head>
       <body>
         <Providers>
           <div className="min-h-dvh flex flex-col">
