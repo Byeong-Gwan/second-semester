@@ -19,22 +19,28 @@ import {
   BarChart3,
   Award,
   Zap,
-  ArrowRight
+  ArrowRight,
+  XCircle
 } from "lucide-react";
 import { format, startOfWeek, endOfWeek, eachDayOfInterval, isToday } from "date-fns";
 import { ko } from "date-fns/locale";
 import Link from "next/link";
+import { LearningProgressChart } from "@/components/dashboard/LearningProgressChart";
+import { AttendanceChart } from "@/components/dashboard/AttendanceChart";
+import { TodoCompletionChart } from "@/components/dashboard/TodoCompletionChart";
 
 export default function DashboardPage() {
   const [mounted, setMounted] = React.useState(false);
   
   const learnings = useLearningStore((s) => s.learnings);
   const { todos, getCompletionRate, toggleTodo } = useTodoStore();
-  const { records, getAttendanceRate, getMonthRecords, markAttendance, removeAttendance } = useAttendanceStore();
+  const { records, getAttendanceRate, getMonthRecords, markAttendance, removeAttendance, autoMarkAbsentForPastDays } = useAttendanceStore();
 
   React.useEffect(() => {
     setMounted(true);
-  }, []);
+    // 페이지 로드 시 자동으로 과거 미체크 날짜를 결석으로 처리
+    autoMarkAbsentForPastDays();
+  }, [autoMarkAbsentForPastDays]);
 
   if (!mounted) {
     return (
@@ -190,9 +196,24 @@ export default function DashboardPage() {
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
-            <p className="text-sm text-muted-foreground mt-2">
-              ⚪ 미체크 · ✅ 출석 · ⏰ 지각 · ❌ 결석
-            </p>
+            <div className="flex items-center gap-4 text-xs text-muted-foreground mt-2">
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-3 rounded-full bg-gray-400 dark:bg-gray-600" />
+                <span>미체크</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-3 rounded-full bg-green-500" />
+                <span>출석</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                <span>지각</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-3 rounded-full bg-red-500" />
+                <span>결석</span>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-7 gap-2">
@@ -233,16 +254,16 @@ export default function DashboardPage() {
                       aria-label="출석 상태 변경"
                     >
                       {status === "present" && (
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-green-400 to-green-600 shadow-lg shadow-green-500/50" />
+                        <div className="w-8 h-8 rounded-full bg-green-500 shadow-md" />
                       )}
                       {status === "late" && (
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 shadow-lg shadow-yellow-500/50" />
+                        <div className="w-8 h-8 rounded-full bg-yellow-500 shadow-md" />
                       )}
                       {status === "absent" && (
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-red-400 to-red-600 shadow-lg shadow-red-500/50" />
+                        <div className="w-8 h-8 rounded-full bg-red-500 shadow-md" />
                       )}
                       {!status && (
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gray-300 to-gray-400 dark:from-gray-600 dark:to-gray-700 shadow-md" />
+                        <div className="w-8 h-8 rounded-full bg-gray-400 dark:bg-gray-600 shadow-md" />
                       )}
                     </button>
                   </div>
@@ -571,6 +592,16 @@ export default function DashboardPage() {
             </div>
           </CardContent>
         </Card>
+      </section>
+
+      {/* 차트 분석 */}
+      <section className="space-y-4">
+        <h2 className="text-2xl font-bold">📊 상세 분석</h2>
+        <div className="grid gap-4 md:grid-cols-2">
+          <LearningProgressChart />
+          <AttendanceChart />
+        </div>
+        <TodoCompletionChart />
       </section>
 
       {/* 빠른 액션 */}
