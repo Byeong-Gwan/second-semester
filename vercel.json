@@ -5,11 +5,6 @@
   "framework": "nextjs",
   "outputDirectory": ".next",
   "regions": ["icn1"],
-  "env": {
-    "NEXT_PUBLIC_OPENWEATHER_API_KEY": "@openweather-api-key",
-    "NEXT_PUBLIC_NAVER_CLIENT_ID": "@naver-client-id",
-    "NEXT_PUBLIC_NAVER_CLIENT_SECRET": "@naver-client-secret"
-  },
   "headers": [
     {
       "source": "/(.*)",
