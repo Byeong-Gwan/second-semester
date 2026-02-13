@@ -33,7 +33,7 @@ export default function LearningDetailPage() {
             <div className="text-center space-y-2">
               <p className="text-sm text-muted-foreground">학습을 찾을 수 없습니다</p>
               <button
-                onClick={() => router.push("/mypage")}
+                onClick={() => router.push("/activity?tab=learning")}
                 className="text-sm text-primary hover:underline"
               >
                 목록으로 돌아가기
@@ -53,7 +53,7 @@ export default function LearningDetailPage() {
   const handleDelete = () => {
     if (confirm("이 학습을 삭제하시겠습니까?")) {
       removeLearning(id);
-      router.push("/mypage");
+      router.push("/activity?tab=learning");
     }
   };
 
@@ -62,7 +62,7 @@ export default function LearningDetailPage() {
       {/* 헤더 */}
       <div className="flex items-center gap-4">
         <button
-          onClick={() => router.push("/mypage")}
+          onClick={() => router.push("/activity?tab=learning")}
           className="rounded-md border p-2 hover:bg-accent"
         >
           <ArrowLeft size={20} />

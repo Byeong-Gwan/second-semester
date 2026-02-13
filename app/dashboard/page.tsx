@@ -189,7 +189,7 @@ export default function DashboardPage() {
                 이번 주 출석 현황
               </CardTitle>
               <Link 
-                href="/mypage/attendance" 
+                href="/activity?tab=attendance" 
                 className="text-sm text-primary hover:underline flex items-center gap-1"
               >
                 출석 체크하기
@@ -274,7 +274,7 @@ export default function DashboardPage() {
               <div className="mt-4 p-4 rounded-lg bg-muted/50 text-center">
                 <p className="text-sm text-muted-foreground">
                   아직 출석 체크를 하지 않았어요. 
-                  <Link href="/mypage/attendance" className="text-primary hover:underline ml-1">
+                  <Link href="/activity?tab=attendance" className="text-primary hover:underline ml-1">
                     출석 관리 페이지
                   </Link>
                   에서 캘린더 날짜를 클릭하여 출석 체크하세요!
@@ -295,7 +295,7 @@ export default function DashboardPage() {
               <Badge variant="secondary">{todayTodos.length}개</Badge>
             </CardTitle>
             <Link 
-              href="/mypage/todos"
+              href="/activity?tab=todos"
               className="text-sm text-primary hover:underline"
             >
               전체 보기 →
@@ -307,7 +307,7 @@ export default function DashboardPage() {
                 <Clock className="h-12 w-12 mx-auto mb-2 opacity-50" />
                 <p>오늘 예정된 할 일이 없습니다</p>
                 <Link 
-                  href="/mypage/todos"
+                  href="/activity?tab=todos"
                   className="text-sm text-primary hover:underline mt-2 inline-block"
                 >
                   할 일 추가하기
@@ -363,7 +363,7 @@ export default function DashboardPage() {
                 ))}
                 {todayTodos.length > 5 && (
                   <Link 
-                    href="/mypage/todos"
+                    href="/activity?tab=todos"
                     className="block text-center text-sm text-primary hover:underline py-2"
                   >
                     +{todayTodos.length - 5}개 더 보기
@@ -385,7 +385,7 @@ export default function DashboardPage() {
               <Badge variant="secondary">{activeLearnings.length}개</Badge>
             </CardTitle>
             <Link 
-              href="/mypage"
+              href="/activity?tab=learning"
               className="text-sm text-primary hover:underline"
             >
               전체 보기 →
@@ -397,7 +397,7 @@ export default function DashboardPage() {
                 <BookOpen className="h-12 w-12 mx-auto mb-2 opacity-50" />
                 <p>진행 중인 학습이 없습니다</p>
                 <Link 
-                  href="/"
+                  href="/activity?tab=learning"
                   className="text-sm text-primary hover:underline mt-2 inline-block"
                 >
                   학습 시작하기
@@ -606,7 +606,7 @@ export default function DashboardPage() {
 
       {/* 빠른 액션 */}
       <section className="grid gap-4 md:grid-cols-2">
-        <Link href="/mypage/todos">
+        <Link href="/activity?tab=todos">
           <Card className="border-2 hover:border-primary hover:shadow-lg transition-all cursor-pointer">
             <CardContent className="flex items-center gap-4 pt-6">
               <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
@@ -622,7 +622,7 @@ export default function DashboardPage() {
           </Card>
         </Link>
 
-        <Link href="/mypage/attendance">
+        <Link href="/activity?tab=attendance">
           <Card className="border-2 hover:border-primary hover:shadow-lg transition-all cursor-pointer">
             <CardContent className="flex items-center gap-4 pt-6">
               <div className="h-12 w-12 rounded-full bg-orange-500/10 flex items-center justify-center">
