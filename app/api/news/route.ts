@@ -31,7 +31,7 @@ function cleanHtmlText(text: string): string {
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const query = searchParams.get('query') || '주요뉴스';
-  const display = searchParams.get('display') || '5';
+  const display = searchParams.get('display') || '100';
 
   if (!CLIENT_ID || !CLIENT_SECRET) {
     return NextResponse.json(
