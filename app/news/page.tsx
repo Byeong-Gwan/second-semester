@@ -3,7 +3,7 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink, Newspaper, TrendingUp, Clock } from "lucide-react";
+import { ExternalLink, Newspaper, TrendingUp, Clock, ArrowRight } from "lucide-react";
 
 // 뉴스 데이터 타입
 interface NewsItem {
@@ -17,59 +17,50 @@ interface NewsItem {
   isEditorial: boolean;
 }
 
-// 임시 뉴스 데이터 (실제로는 API에서 가져와야 함)
-const mockNews: NewsItem[] = [
-  {
-    id: "1",
-    title: "[사설] 디지털 전환 시대, 교육 혁신이 시급하다",
-    summary: "인공지능과 디지털 기술의 발전으로 교육 현장의 변화가 불가피해졌다. 단순 암기식 교육에서 벗어나 창의성과 문제해결 능력을 키우는 교육으로의 전환이 필요한 시점이다.",
-    source: "조선일보",
-    category: "사회",
-    publishedAt: "2026-02-09T09:00:00",
-    url: "#",
-    isEditorial: true,
-  },
-  {
-    id: "2",
-    title: "[사설] 청년 실업 해소, 정부와 기업의 협력이 답이다",
-    summary: "청년 실업률이 여전히 높은 수준을 유지하고 있다. 정부의 일자리 정책과 기업의 적극적인 채용이 맞물려야 청년들에게 희망을 줄 수 있다.",
-    source: "중앙일보",
-    category: "경제",
-    publishedAt: "2026-02-09T08:30:00",
-    url: "#",
-    isEditorial: true,
-  },
-  {
-    id: "3",
-    title: "[사설] 기후 위기 대응, 더 이상 미룰 수 없다",
-    summary: "전 세계적으로 이상기후 현상이 빈번해지고 있다. 탄소 중립 목표 달성을 위한 실질적인 행동이 시급하며, 모든 국가의 협력이 필요하다.",
-    source: "한겨레",
-    category: "국제",
-    publishedAt: "2026-02-09T08:00:00",
-    url: "#",
-    isEditorial: true,
-  },
-  {
-    id: "4",
-    title: "[사설] 저출산 극복, 육아 지원 확대가 우선이다",
-    summary: "저출산 문제가 국가적 위기로 대두되고 있다. 출산 장려금보다는 실질적인 육아 지원과 일-가정 양립 정책이 더 효과적일 것이다.",
-    source: "동아일보",
-    category: "사회",
-    publishedAt: "2026-02-09T07:30:00",
-    url: "#",
-    isEditorial: true,
-  },
-  {
-    id: "5",
-    title: "[사설] 반도체 산업 경쟁력 강화, 인재 양성이 핵심",
-    summary: "글로벌 반도체 경쟁이 치열해지는 가운데, 우리나라의 경쟁력 유지를 위해서는 우수한 인재 양성과 연구개발 투자 확대가 필수적이다.",
-    source: "매일경제",
-    category: "경제",
-    publishedAt: "2026-02-09T07:00:00",
-    url: "#",
-    isEditorial: true,
-  },
-];
+// 네이버 API 응답 타입
+interface NaverNewsResponse {
+  items: Array<{
+    title: string;
+    link: string;
+    description: string;
+    pubDate: string;
+    originallink: string;
+  }>;
+}
+
+// 네이버 뉴스를 NewsItem으로 변환
+function convertNaverNews(item: NaverNewsResponse['items'][0], index: number): NewsItem {
+  const source = item.link.includes('news.naver.com') ? 
+    item.link.split('.')[1] : '언론사';
+  
+  const categoryMap: { [key: string]: NewsItem['category'] } = {
+    '정치': '정치',
+    '경제': '경제', 
+    '사회': '사회',
+    '국제': '국제',
+    '문화': '문화',
+  };
+  
+  // 뉴스 제목에서 카테고리 추출 (간단)
+  let category: NewsItem['category'] = '사회';
+  for (const [key, value] of Object.entries(categoryMap)) {
+    if (item.title.includes(key)) {
+      category = value;
+      break;
+    }
+  }
+  
+  return {
+    id: item.link || `news-${index}`,
+    title: item.title,
+    summary: item.description,
+    source,
+    category,
+    publishedAt: item.pubDate,
+    url: item.link,
+    isEditorial: item.title.includes('[사설]'),
+  };
+}
 
 const categoryColors = {
   정치: "bg-blue-100 text-blue-700 dark:bg-blue-950/50 dark:text-blue-400 border-blue-500",
@@ -81,13 +72,40 @@ const categoryColors = {
 
 export default function NewsPage() {
   const [selectedCategory, setSelectedCategory] = React.useState<string>("전체");
-  const [mounted, setMounted] = React.useState(false);
+  const [news, setNews] = React.useState<NewsItem[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
+  const [displayCount, setDisplayCount] = React.useState(5);
+  const [isMobile, setIsMobile] = React.useState(false);
 
   React.useEffect(() => {
-    setMounted(true);
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+      setDisplayCount(window.innerWidth < 768 ? 5 : 20);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  if (!mounted) {
+  React.useEffect(() => {
+    fetch("/api/news")
+      .then((res) => res.json())
+      .then((data: NaverNewsResponse) => {
+        if (data.items) {
+          const convertedNews = data.items.map((item, index) => convertNaverNews(item, index));
+          setNews(convertedNews);
+        }
+      })
+      .catch((err) => {
+        console.error('뉴스 로딩 실패:', err);
+        setError('뉴스를 불러올 수 없습니다.');
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
     return (
       <main className="container max-w-6xl py-8">
         <div className="animate-pulse space-y-6">
@@ -102,9 +120,19 @@ export default function NewsPage() {
     );
   }
 
+  if (error) {
+    return (
+      <main className="container max-w-6xl py-8">
+        <div className="text-center py-20">
+          <p className="text-muted-foreground">{error}</p>
+        </div>
+      </main>
+    );
+  }
+
   const filteredNews = selectedCategory === "전체" 
-    ? mockNews 
-    : mockNews.filter(news => news.category === selectedCategory);
+    ? news 
+    : news.filter((item: NewsItem) => item.category === selectedCategory);
 
   const categories = ["전체", "정치", "경제", "사회", "국제", "문화"];
 
@@ -140,26 +168,7 @@ export default function NewsPage() {
         </div>
       </section>
 
-      {/* 안내 카드 */}
-      <Card className="border-2 border-yellow-200 bg-yellow-50 dark:bg-yellow-950/20 dark:border-yellow-800">
-        <CardContent className="pt-6">
-          <div className="flex items-start gap-3">
-            <TrendingUp className="h-5 w-5 text-yellow-600 mt-0.5" />
-            <div>
-              <h3 className="font-semibold text-yellow-900 dark:text-yellow-400 mb-1">
-                뉴스 API 연동 필요
-              </h3>
-              <p className="text-sm text-yellow-800 dark:text-yellow-500">
-                현재는 샘플 데이터를 표시하고 있습니다. 실제 뉴스를 보려면 뉴스 API를 연동해야 합니다.
-              </p>
-              <p className="text-xs text-yellow-700 dark:text-yellow-600 mt-2">
-                추천: NewsAPI, Google News RSS, 네이버 뉴스 API 등
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
+      
       {/* 뉴스 리스트 */}
       <section className="space-y-4">
         {filteredNews.length === 0 ? (
@@ -170,43 +179,64 @@ export default function NewsPage() {
             </CardContent>
           </Card>
         ) : (
-          filteredNews.map((news) => (
-            <Card
-              key={news.id}
-              className="border-2 hover:shadow-lg transition-all hover:border-primary/50 cursor-pointer"
-            >
-              <CardHeader>
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1 space-y-2">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      {news.isEditorial && (
-                        <Badge variant="outline" className="bg-red-100 border-red-500 text-red-700 dark:bg-red-950/50 dark:text-red-400 font-semibold">
-                          사설
-                        </Badge>
-                      )}
-                      <Badge variant="outline" className={categoryColors[news.category]}>
-                        {news.category}
-                      </Badge>
-                      <span className="text-xs text-muted-foreground">{news.source}</span>
+          <>
+            {/* 뉴스 목록 */}
+            <div className="space-y-4">
+              {filteredNews.slice(0, displayCount).map((news) => (
+                <Card
+                  key={news.id}
+                  className="border-2 hover:shadow-lg transition-all hover:border-primary/50 cursor-pointer"
+                >
+                  <CardHeader>
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 space-y-2">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          {news.isEditorial && (
+                            <Badge variant="outline" className="bg-red-100 border-red-500 text-red-700 dark:bg-red-950/50 dark:text-red-400 font-semibold">
+                              사설
+                            </Badge>
+                          )}
+                          <Badge variant="outline" className={categoryColors[news.category]}>
+                            {news.category}
+                          </Badge>
+                          <span className="text-xs text-muted-foreground">{news.source}</span>
+                        </div>
+                        <CardTitle className="text-xl leading-tight hover:text-primary transition-colors">
+                          {news.title}
+                        </CardTitle>
+                      </div>
+                      <ExternalLink className="h-5 w-5 text-muted-foreground shrink-0" />
                     </div>
-                    <CardTitle className="text-xl leading-tight hover:text-primary transition-colors">
-                      {news.title}
-                    </CardTitle>
-                  </div>
-                  <ExternalLink className="h-5 w-5 text-muted-foreground shrink-0" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground leading-relaxed mb-3">
-                  {news.summary}
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground leading-relaxed mb-3">
+                      {news.summary}
+                    </p>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <Clock className="h-3 w-3" />
+                      <span>{formatTime(news.publishedAt)}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {/* 더보기 버튼 */}
+            {displayCount < filteredNews.length && (
+              <div className="text-center">
+                <button
+                  onClick={() => setDisplayCount(prev => prev + (isMobile ? 5 : 20))}
+                  className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-base font-semibold text-primary-foreground hover:bg-primary/90 active:scale-[0.98] transition-all min-h-[52px]"
+                >
+                  더보기
+                  <ArrowRight className="h-5 w-5" />
+                </button>
+                <p className="text-sm text-muted-foreground mt-2">
+                  현재 {displayCount}개 / 전체 {filteredNews.length}개
                 </p>
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Clock className="h-3 w-3" />
-                  <span>{formatTime(news.publishedAt)}</span>
-                </div>
-              </CardContent>
-            </Card>
-          ))
+              </div>
+            )}
+          </>
         )}
       </section>
 

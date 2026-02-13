@@ -2,6 +2,29 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 스크롤바 숨기기 유틸리티 */
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+
+/* 모달 애니메이션 */
+@keyframes slide-in-from-bottom {
+  from { transform: translateY(16px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.animate-in {
+  animation: slide-in-from-bottom 0.2s ease-out;
+}
+
 /* 모바일 터치 최적화 */
 @layer base {
   * {

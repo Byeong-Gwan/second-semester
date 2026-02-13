@@ -18,6 +18,7 @@ interface LearningState {
   toggleJoined: (id: string) => void;
   updateProgress: (id: string, progress: number) => void;
   updateDates: (id: string, startDate?: string, endDate?: string) => void;
+  updateLearning: (id: string, updates: Partial<Omit<Learning, "id" | "createdAt">>) => void;
 }
 
 export const useLearningStore = create<LearningState>()(
@@ -43,6 +44,9 @@ export const useLearningStore = create<LearningState>()(
       },
       updateDates: (id: string, startDate?: string, endDate?: string) => {
         set((s) => ({ learnings: s.learnings.map((l) => (l.id === id ? { ...l, startDate, endDate } : l)) }));
+      },
+      updateLearning: (id: string, updates: Partial<Omit<Learning, "id" | "createdAt">>) => {
+        set((s) => ({ learnings: s.learnings.map((l) => (l.id === id ? { ...l, ...updates } : l)) }));
       },
     }),
     {
