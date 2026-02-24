@@ -20,8 +20,8 @@ export function BottomNav() {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 safe-area-bottom">
-      <div className="flex items-center justify-around h-16 max-w-lg mx-auto">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background safe-area-bottom" style={{ WebkitTapHighlightColor: 'transparent' }}>
+      <div className="flex items-center justify-around h-[68px] max-w-lg mx-auto px-2">
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
           const active = isActive(item.href);
@@ -29,10 +29,10 @@ export function BottomNav() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center justify-center gap-1 w-full h-full transition-colors active:scale-95 ${
+              className={`flex flex-col items-center justify-center gap-1 w-full min-h-[56px] py-2 rounded-xl transition-colors touch-manipulation ${
                 active
-                  ? "text-primary"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "text-primary bg-primary/10"
+                  : "text-muted-foreground hover:text-foreground active:bg-muted"
               }`}
             >
               <Icon className={`h-6 w-6 ${active ? "stroke-[2.5]" : ""}`} />
