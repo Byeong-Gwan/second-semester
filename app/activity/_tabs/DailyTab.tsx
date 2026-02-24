@@ -144,7 +144,7 @@ export default function DailyTab() {
               <Card key={item.id}>
                 <CardContent className="p-3">
                   <a
-                    href={item.url}
+                    href={item.link || item.url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-start gap-3 group"

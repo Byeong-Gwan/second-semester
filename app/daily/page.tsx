@@ -156,11 +156,11 @@ export default function DailyPage() {
         ) : news.length > 0 ? (
           <>
             <div className="space-y-2">
-              {news.slice(0, newsDisplayCount).map((item) => (
-                <Card key={item.id}>
+              {news.slice(0, newsDisplayCount).map((item, index) => (
+                <Card key={item.id || index}>
                   <CardContent className="p-3">
                     <a
-                      href={item.url}
+                      href={item.link || item.url}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-start gap-3 group"

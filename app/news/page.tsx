@@ -183,41 +183,48 @@ export default function NewsPage() {
             {/* 뉴스 목록 */}
             <div className="space-y-4">
               {filteredNews.slice(0, displayCount).map((news) => (
-                <Card
+                <a
                   key={news.id}
-                  className="border-2 hover:shadow-lg transition-all hover:border-primary/50 cursor-pointer"
+                  href={news.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block"
                 >
-                  <CardHeader>
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1 space-y-2">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          {news.isEditorial && (
-                            <Badge variant="outline" className="bg-red-100 border-red-500 text-red-700 dark:bg-red-950/50 dark:text-red-400 font-semibold">
-                              사설
+                  <Card
+                    className="border-2 hover:shadow-lg transition-all hover:border-primary/50 cursor-pointer"
+                  >
+                    <CardHeader>
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1 space-y-2">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            {news.isEditorial && (
+                              <Badge variant="outline" className="bg-red-100 border-red-500 text-red-700 dark:bg-red-950/50 dark:text-red-400 font-semibold">
+                                사설
+                              </Badge>
+                            )}
+                            <Badge variant="outline" className={categoryColors[news.category]}>
+                              {news.category}
                             </Badge>
-                          )}
-                          <Badge variant="outline" className={categoryColors[news.category]}>
-                            {news.category}
-                          </Badge>
-                          <span className="text-xs text-muted-foreground">{news.source}</span>
+                            <span className="text-xs text-muted-foreground">{news.source}</span>
+                          </div>
+                          <CardTitle className="text-xl leading-tight hover:text-primary transition-colors">
+                            {news.title}
+                          </CardTitle>
                         </div>
-                        <CardTitle className="text-xl leading-tight hover:text-primary transition-colors">
-                          {news.title}
-                        </CardTitle>
+                        <ExternalLink className="h-5 w-5 text-muted-foreground shrink-0" />
                       </div>
-                      <ExternalLink className="h-5 w-5 text-muted-foreground shrink-0" />
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground leading-relaxed mb-3">
-                      {news.summary}
-                    </p>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <Clock className="h-3 w-3" />
-                      <span>{formatTime(news.publishedAt)}</span>
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-muted-foreground leading-relaxed mb-3">
+                        {news.summary}
+                      </p>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <Clock className="h-3 w-3" />
+                        <span>{formatTime(news.publishedAt)}</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </a>
               ))}
             </div>
 
