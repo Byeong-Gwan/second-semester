@@ -15,15 +15,37 @@ const nextConfig = {
     ],
     formats: ['image/avif', 'image/webp'],
   },
-  async rewrites() {
+  async redirects() {
     return [
       {
-        source: '/api/weather',
-        destination: '/api/weather',
+        source: '/dashboard',
+        destination: '/',
+        permanent: true,
       },
       {
-        source: '/api/news',
-        destination: '/api/news',
+        source: '/mypage/todos',
+        destination: '/activity?tab=todos',
+        permanent: true,
+      },
+      {
+        source: '/mypage/attendance',
+        destination: '/activity?tab=attendance',
+        permanent: true,
+      },
+      {
+        source: '/mypage/reflection',
+        destination: '/activity?tab=reflection',
+        permanent: true,
+      },
+      {
+        source: '/mypage/study-log',
+        destination: '/activity?tab=study-log',
+        permanent: true,
+      },
+      {
+        source: '/mypage/settings',
+        destination: '/settings',
+        permanent: true,
       },
     ];
   },
