@@ -20,6 +20,7 @@ interface NewsItem {
   source: string;
   category: string;
   url: string;
+  link?: string;
 }
 
 export default function DailyPage() {
