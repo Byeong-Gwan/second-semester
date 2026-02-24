@@ -11,34 +11,28 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1,
     },
     {
-      url: `${baseUrl}/dashboard`,
+      url: `${baseUrl}/activity`,
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/mypage`,
+      url: `${baseUrl}/daily`,
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/mypage/todos`,
+      url: `${baseUrl}/settings`,
       lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.8,
+      changeFrequency: 'weekly',
+      priority: 0.5,
     },
     {
-      url: `${baseUrl}/mypage/timeline`,
+      url: `${baseUrl}/news`,
       lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/mypage/attendance`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.8,
+      changeFrequency: 'hourly',
+      priority: 0.7,
     },
     {
       url: `${baseUrl}/weather`,
@@ -47,10 +41,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/mypage/settings`,
+      url: `${baseUrl}/mypage/report`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
-      priority: 0.5,
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/timeline`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.7,
     },
   ]
 }

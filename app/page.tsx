@@ -361,17 +361,9 @@ function NewsSummary() {
     <div className="space-y-1">
       {news.slice(0, displayCount).map((item, index) => (
         <p key={index} className="text-xs text-muted-foreground truncate">
-          {item.title?.slice(0, 25)}...
+          • {item.title}
         </p>
       ))}
-      {displayCount < news.length && news.length > displayCount && (
-        <button 
-          onClick={() => setDisplayCount(prev => prev + 1)}
-          className="text-xs text-primary hover:underline"
-        >
-          더보기
-        </button>
-      )}
     </div>
   );
 }
