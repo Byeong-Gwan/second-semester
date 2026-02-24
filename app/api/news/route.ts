@@ -64,6 +64,13 @@ export async function GET(request: NextRequest) {
         title: cleanHtmlText(item.title),
         description: cleanHtmlText(item.description),
       }));
+
+      // 중국 관련 뉴스 필터링
+      const chinaKeywords = ['중국', '시진핑', '베이징', '중공', '화웨이', 'China', 'Beijing'];
+      data.items = data.items.filter((item: any) => {
+        const text = `${item.title} ${item.description}`.toLowerCase();
+        return !chinaKeywords.some(keyword => text.includes(keyword.toLowerCase()));
+      });
     }
     
     return NextResponse.json(data);
