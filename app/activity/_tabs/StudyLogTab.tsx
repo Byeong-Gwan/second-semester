@@ -132,18 +132,12 @@ export default function StudyLogTab() {
         </div>
       )}
 
-      {/* 원형 타임라인 링크 안내 */}
+      {/* 안내 */}
       <Card>
         <CardContent className="p-4 text-center">
           <p className="text-sm text-muted-foreground">
-            원형 타임라인으로 학습 기록을 추가하려면
+            위에서 날짜와 시간을 선택하여 학습 기록을 추가하세요.
           </p>
-          <a
-            href="/mypage/study-log"
-            className="text-sm text-primary font-medium hover:underline mt-1 inline-block"
-          >
-            학습 일지 페이지로 이동 →
-          </a>
         </CardContent>
       </Card>
     </div>

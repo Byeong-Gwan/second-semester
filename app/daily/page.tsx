@@ -80,9 +80,6 @@ export default function DailyPage() {
             <Cloud className="h-5 w-5 text-blue-500" />
             날씨
           </h2>
-          <Link href="/weather" className="text-sm text-primary font-medium">
-            상세 보기 →
-          </Link>
         </div>
 
         {weatherLoading ? (
@@ -123,7 +120,6 @@ export default function DailyPage() {
           <Card>
             <CardContent className="p-4 text-center text-sm text-muted-foreground">
               날씨 정보를 불러올 수 없습니다.
-              <Link href="/weather" className="text-primary ml-1">직접 확인하기 →</Link>
             </CardContent>
           </Card>
         )}

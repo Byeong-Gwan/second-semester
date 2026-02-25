@@ -10,7 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import {
-  BookOpen, CheckSquare, UserCheck, Flame, ArrowRight,
+  CheckSquare, UserCheck, Flame, ArrowRight,
   CheckCircle2, PenLine, Layers, Cloud, Newspaper
 } from "lucide-react";
 import { format } from "date-fns";
@@ -222,28 +222,28 @@ export default function TodayPage() {
       {/* 빠른 링크 */}
       {hasAnyData && (
         <section className="grid grid-cols-2 gap-3">
-          <Link href="/dashboard">
+          <Link href="/activity">
             <Card className="border-2 hover:border-blue-300 dark:hover:border-blue-700 transition-colors h-full">
               <CardContent className="p-4 flex items-center gap-3">
                 <div className="h-10 w-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
-                  <BookOpen className="h-5 w-5 text-blue-600" />
+                  <Layers className="h-5 w-5 text-blue-600" />
                 </div>
                 <div>
-                  <p className="font-semibold text-sm">대시보드</p>
-                  <p className="text-xs text-muted-foreground">차트 보기</p>
+                  <p className="font-semibold text-sm">활동 관리</p>
+                  <p className="text-xs text-muted-foreground">학습·할일·출석</p>
                 </div>
               </CardContent>
             </Card>
           </Link>
-          <Link href="/mypage/report">
+          <Link href="/daily">
             <Card className="border-2 hover:border-purple-300 dark:hover:border-purple-700 transition-colors h-full">
               <CardContent className="p-4 flex items-center gap-3">
                 <div className="h-10 w-10 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center shrink-0">
-                  <Flame className="h-5 w-5 text-purple-600" />
+                  <Newspaper className="h-5 w-5 text-purple-600" />
                 </div>
                 <div>
-                  <p className="font-semibold text-sm">성과 리포트</p>
-                  <p className="text-xs text-muted-foreground">인사이트</p>
+                  <p className="font-semibold text-sm">오늘의 일상</p>
+                  <p className="text-xs text-muted-foreground">날씨·뉴스</p>
                 </div>
               </CardContent>
             </Card>

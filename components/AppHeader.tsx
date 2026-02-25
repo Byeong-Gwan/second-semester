@@ -7,30 +7,15 @@ import { ThemeToggle } from "@/components/theme-toggle";
 const PAGE_TITLES: Record<string, string> = {
   "/": "오늘",
   "/activity": "활동",
-  "/activity/learning": "학습 관리",
-  "/activity/todos": "할 일",
-  "/activity/attendance": "출석",
-  "/activity/reflection": "회고",
-  "/activity/study-log": "학습 일지",
-  "/settings": "설정",
   "/daily": "일상",
-  "/dashboard": "대시보드",
-  "/mypage": "내 학습",
-  "/mypage/todos": "할 일",
-  "/mypage/attendance": "출석",
-  "/mypage/reflection": "회고",
-  "/mypage/study-log": "학습 일지",
-  "/mypage/report": "성과 리포트",
-  "/mypage/timeline": "타임라인",
-  "/mypage/settings": "설정",
+  "/news": "뉴스",
+  "/settings": "설정",
 };
 
 function getPageTitle(pathname: string): string {
   if (PAGE_TITLES[pathname]) return PAGE_TITLES[pathname];
-  // /mypage/learning/[id] 같은 동적 경로
-  if (pathname.startsWith("/mypage/learning/")) return "학습 상세";
   if (pathname.startsWith("/activity")) return "활동";
-  if (pathname.startsWith("/mypage")) return "내 학습";
+  if (pathname.startsWith("/daily")) return "일상";
   return "Second Semester";
 }
 
