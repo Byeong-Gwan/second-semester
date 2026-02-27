@@ -3,7 +3,7 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Moon, Sun, Download, Upload, Trash2, Info } from "lucide-react";
+import { Moon, Sun, Download, Upload, Trash2, Info, MessageCircle } from "lucide-react";
 
 export default function SettingsPage() {
   const [mounted, setMounted] = React.useState(false);
@@ -137,6 +137,27 @@ export default function SettingsPage() {
         </Card>
       </section>
 
+      {/* 개선 및 문의 */}
+      <section className="space-y-3">
+        <h2 className="text-lg font-bold">개선 및 문의</h2>
+        <Card>
+          <CardContent className="p-4">
+            <a
+              href="mailto:ansd43@gmail.com?subject=[Second Semester] 개선/문의사항&body=안녕하세요!%0A%0A아래 내용을 작성해주세요:%0A%0A📌 유형: (버그 / 개선 제안 / 문의)%0A📝 내용:%0A%0A"
+              className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent transition-colors min-h-[52px]"
+            >
+              <div className="h-10 w-10 rounded-xl bg-teal-100 dark:bg-teal-900/30 flex items-center justify-center shrink-0">
+                <MessageCircle className="h-5 w-5 text-teal-600" />
+              </div>
+              <div>
+                <p className="font-semibold">개선 사항 · 문의하기</p>
+                <p className="text-xs text-muted-foreground">이메일로 의견을 보내주세요</p>
+              </div>
+            </a>
+          </CardContent>
+        </Card>
+      </section>
+
       {/* 앱 정보 */}
       <section className="space-y-3">
         <h2 className="text-lg font-bold">정보</h2>
@@ -148,12 +169,12 @@ export default function SettingsPage() {
               </div>
               <div>
                 <p className="font-semibold">Second Semester</p>
-                <p className="text-xs text-muted-foreground">v2.0.0 · 학습 관리 플래너</p>
+                <p className="text-xs text-muted-foreground">v2.1.2 · 학습 관리 플래너</p>
               </div>
             </div>
             <div className="mt-4 p-3 rounded-xl bg-muted/50 text-xs text-muted-foreground space-y-1">
-              <p>• 모든 데이터는 브라우저 로컬 저장소에 저장됩니다</p>
-              <p>• 브라우저 데이터를 삭제하면 앱 데이터도 삭제됩니다</p>
+              <p>• 로그인하면 여러 기기에서 데이터를 동기화할 수 있습니다</p>
+              <p>• 로그인 없이도 사용 가능 (데이터는 이 브라우저에만 저장)</p>
               <p>• 정기적으로 데이터를 백업하는 것을 권장합니다</p>
             </div>
           </CardContent>
