@@ -9,6 +9,7 @@ import { ChevronLeft, ChevronRight, Save, Pencil, Trash2, GraduationCap, User, B
 import { format, addDays, subDays } from "date-fns";
 import { ko } from "date-fns/locale";
 import { ActivityHeatmap } from "@/components/reflection/ActivityHeatmap";
+import { useGlobalPopupState } from "@/lib/hooks/usePopupState";
 
 const CATEGORIES = {
   study: { icon: GraduationCap, label: "학습", color: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400" },

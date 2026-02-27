@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Pencil, Trash2, X, CheckCircle2, Calendar } from "lucide-react";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
+import { useGlobalPopupState } from "@/lib/hooks/usePopupState";
 
 const priorityConfig = {
   high: { label: "높음", color: "bg-red-100 text-red-700 dark:bg-red-950/50 dark:text-red-400 border-red-500", prefix: "🔥 " },
@@ -20,8 +21,18 @@ export default function TodosTab() {
   const [editTarget, setEditTarget] = React.useState<Todo | null>(null);
   const [filter, setFilter] = React.useState<"all" | "active" | "completed">("all");
   const [mounted, setMounted] = React.useState(false);
+  const { openPopup, closePopup } = useGlobalPopupState();
 
   React.useEffect(() => { setMounted(true); }, []);
+  
+  React.useEffect(() => {
+    if (showModal) {
+      openPopup('drawer');
+    } else {
+      closePopup();
+    }
+  }, [showModal]);
+  
   if (!mounted) return <div className="animate-pulse h-40 bg-muted rounded-xl" />;
 
   const completionRate = getCompletionRate();

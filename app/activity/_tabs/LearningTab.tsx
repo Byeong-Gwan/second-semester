@@ -5,14 +5,25 @@ import { useLearningStore, type Learning } from "@/lib/store/learnings";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Pencil, Trash2, X } from "lucide-react";
+import { useGlobalPopupState } from "@/lib/hooks/usePopupState";
 
 export default function LearningTab() {
   const { learnings, addLearning, removeLearning, updateLearning } = useLearningStore();
   const [showModal, setShowModal] = React.useState(false);
   const [editTarget, setEditTarget] = React.useState<Learning | null>(null);
   const [mounted, setMounted] = React.useState(false);
+  const { openPopup, closePopup } = useGlobalPopupState();
 
   React.useEffect(() => { setMounted(true); }, []);
+  
+  React.useEffect(() => {
+    if (showModal) {
+      openPopup('drawer');
+    } else {
+      closePopup();
+    }
+  }, [showModal]);
+  
   if (!mounted) return <div className="animate-pulse h-40 bg-muted rounded-xl" />;
 
   const handleEdit = (learning: Learning) => {
