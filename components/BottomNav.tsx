@@ -3,6 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import { Home, Layers, Sun, Settings } from "lucide-react";
 import React from "react";
+import { useGlobalPopupState } from "@/lib/hooks/usePopupState";
 
 const NAV_ITEMS = [
   { href: "/", icon: Home, label: "오늘" },
@@ -14,6 +15,7 @@ const NAV_ITEMS = [
 export function BottomNav() {
   const pathname = usePathname();
   const router = useRouter();
+  const { shouldHideBottomNav } = useGlobalPopupState();
 
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";
@@ -28,7 +30,9 @@ export function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background safe-area-bottom"
+      className={`fixed bottom-0 left-0 right-0 z-50 border-t bg-background safe-area-bottom transition-transform duration-300 ${
+        shouldHideBottomNav ? "translate-y-full" : "translate-y-0"
+      }`}
       style={{ WebkitTapHighlightColor: "transparent" }}
     >
       <div className="flex items-stretch justify-around h-[68px] max-w-lg mx-auto">
