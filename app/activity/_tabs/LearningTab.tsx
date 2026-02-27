@@ -63,13 +63,15 @@ export default function LearningTab() {
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-base truncate">{learning.title}</h3>
-                    <div className="flex items-center gap-2 mt-1">
-                      <Badge variant={learning.joined ? "default" : "outline"} className="text-xs">
-                        {learning.joined ? "참여 중" : "대기"}
+                    <div className="flex items-center gap-2 mt-1 flex-wrap">
+                      <Badge variant={learning.joined ? "default" : "outline"} className="text-xs shrink-0">
+                        <span className="hidden sm:inline">{learning.joined ? "참여 중" : "대기"}</span>
+                        <span className="sm:hidden">{learning.joined ? "참여" : "대기"}</span>
                       </Badge>
                       {learning.startDate && (
-                        <span className="text-xs text-muted-foreground">
-                          {learning.startDate} ~ {learning.endDate || ""}
+                        <span className="text-xs text-muted-foreground truncate min-w-0">
+                          <span className="hidden sm:inline">{learning.startDate} ~ {learning.endDate || ""}</span>
+                          <span className="sm:hidden">{learning.startDate}</span>
                         </span>
                       )}
                     </div>
