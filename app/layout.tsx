@@ -4,6 +4,7 @@ import { ReactNode } from "react";
 import { Providers } from "@/components/providers";
 import { BottomNav } from "@/components/BottomNav";
 import { AppHeader } from "@/components/AppHeader";
+import { AuthGuard } from "@/components/AuthGuard";
 import { generateMetadata as genMeta, generateStructuredData } from "@/lib/utils/seo";
 
 export const metadata: Metadata = genMeta({
@@ -29,7 +30,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <div className="min-h-dvh flex flex-col">
             <AppHeader />
             <main className="flex-1 pb-20">
-              {children}
+              <AuthGuard>
+                {children}
+              </AuthGuard>
             </main>
             <BottomNav />
           </div>
